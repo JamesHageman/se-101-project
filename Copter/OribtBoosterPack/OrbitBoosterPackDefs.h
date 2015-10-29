@@ -107,9 +107,11 @@
 #define U1RTSPort		GPIO_PORTC_BASE
 #define U1CTSPort		GPIO_PORTC_BASE
 #define UART1CTS		JB1
-#define UART1TX			JB2
-#define UART1RX			JB3
+#define UART1TXPin		JB2
+#define UART1RXPin		JB3
 #define UART1RTS		JB4
+#define UART1TX			0x00010401
+#define UART1RX			0x00010001
 
 /*
  * SSI Control (on Pmod Header JA)

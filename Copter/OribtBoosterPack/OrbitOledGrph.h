@@ -60,6 +60,7 @@ void	OrbitOledDrawRect(int xco, int yco);
 void	OrbitOledFillRect(int xco, int yco);
 void	OrbitOledGetBmp(int dxco, int dyco, char * pbBmp);
 void	OrbitOledPutBmp(int dxco, int dyco, char * pbBmp);
+void	OrbitOledPutBmpFlipped(int dxco, int dyco, char * pbBmp);
 void	OrbitOledDrawChar(char ch);
 void	OrbitOledDrawString(char * sz);
 

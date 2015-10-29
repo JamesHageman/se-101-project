@@ -796,6 +796,121 @@ OrbitOledPutBmp(int dxco, int dyco, char * pbBits)
 }
 
 /* ------------------------------------------------------------ */
+/***	OrbitOledPutBmpFlipped
+**
+**	Parameters:
+**		dxco		- width of bitmap
+**		dyco		- height of bitmap
+**		pbBits		- pointer to the bitmap bits
+**
+**	Return Value:
+**		none
+**
+**	Errors:
+**		none
+**
+**	Description:
+**		This routine will put the specified bitmap into the display
+**		buffer at the current, flipped from expected perspective
+*/
+
+void
+OrbitOledPutBmpFlipped(int dxco, int dyco, char * pbBits)
+	{
+	int		xcoLeft;
+	int		xcoRight;
+	int		ycoTop;
+	int		ycoBottom;
+	char *	pbDspCur;
+	char *	pbDspLeft;
+	char *	pbBmpCur;
+	char *	pbBmpLeft;
+	int		xcoCur;
+	char	bBmp;
+	char	mskEnd;
+	char	mskUpper;
+	char	mskLower;
+	int		bnAlign;
+	int		fTop;
+
+	/* Set up the four sides of the destination rectangle.
+	*/
+	xcoLeft = xcoOledCur;
+	xcoRight = xcoLeft + dxco;
+	if (xcoRight >= ccolOledMax) {
+		xcoRight = ccolOledMax - 1;
+	}
+
+	ycoTop = ycoOledCur;
+	ycoBottom = ycoTop + dyco;
+	if (ycoBottom >= crowOledMax) {
+		ycoBottom = crowOledMax - 1;
+	}
+
+	bnAlign = ycoTop & 0x07;
+	mskUpper = (1 << bnAlign) - 1;
+	mskLower = ~mskUpper;
+	pbDspLeft = &rgbOledBmp[((ycoTop/8) * ccolOledMax) + xcoLeft];
+	pbBmpLeft = pbBits;
+	fTop = 1;
+
+	while (ycoTop < ycoBottom) {
+		/* Combine with a mask to preserve any upper bits in the byte that aren't
+		** part of the rectangle being filled.
+		** This mask will end up not preserving any bits for bytes that are in
+		** the middle of the rectangle vertically.
+		*/
+		if ((ycoTop / 8) == ((ycoBottom-1) / 8)) {
+			mskEnd = ((1 << (((ycoBottom-1)&0x07)+1)) - 1);
+		}
+		else {
+			mskEnd = 0xFF;
+		}
+		if (fTop) {
+			mskEnd &= ~mskUpper;
+		}
+
+		xcoCur = xcoRight;
+		pbDspCur = pbDspLeft;
+		pbBmpCur = pbBmpLeft + dxco - 1;
+
+		/* Loop through all of the bytes horizontally making up this stripe
+		** of the rectangle.
+		*/
+		if (bnAlign == 0) {
+			while (xcoCur > xcoLeft) {
+				*pbDspCur = (*pfnDoRop)(*pbBmpCur, *pbDspCur, mskEnd);
+				xcoCur -= 1;
+				pbDspCur += 1;
+				pbBmpCur -= 1;
+			}
+		}
+		else {
+			while (xcoCur > xcoLeft) {
+				bBmp = ((*pbBmpCur) << bnAlign);
+				if (!fTop) {
+					bBmp |= ((*(pbBmpCur - dxco) >> (8-bnAlign)) & ~mskLower);
+				}
+				bBmp &= mskEnd;
+				*pbDspCur = (*pfnDoRop)(bBmp, *pbDspCur, mskEnd);
+				xcoCur -= 1;
+				pbDspCur += 1;
+				pbBmpCur -= 1;
+			}
+		}
+
+		/* Advance to the next horizontal stripe.
+		*/
+		ycoTop = 8*((ycoTop/8)+1);
+		pbDspLeft += ccolOledMax;
+		pbBmpLeft += dxco;
+		fTop = 0;
+
+	}
+
+}
+
+/* ------------------------------------------------------------ */
 /***	OrbitOledDrawChar
 **
 **	Parameters:
