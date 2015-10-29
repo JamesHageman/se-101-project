@@ -1,3 +1,4 @@
 ### Getting Started
 
-Copy the `OribtBoosterPack` into the Energia `libraries` folder.
+1. Copy the `OribtBoosterPack` into the Energia `hardware/lm4f/libraries` folder.
+2. Open `Copter.ino` in Energia.

@@ -1,21 +1,23 @@
 extern "C" {
-#include <delay.h>
-#include <FillPat.h>
-#include <I2CEEPROM.h>
-#include <LaunchPad.h>
-#include <OrbitBoosterPackDefs.h>
-#include <OrbitOled.h>
-#include <OrbitOledChar.h>
-#include <OrbitOledGrph.h>
+  #include <delay.h>
+  #include <FillPat.h>
+  #include <I2CEEPROM.h>
+  #include <LaunchPad.h>
+  #include <OrbitBoosterPackDefs.h>
+  #include <OrbitOled.h>
+  #include <OrbitOledChar.h>
+  #include <OrbitOledGrph.h>
+
+  #include "gamestate.h"
+  #include "copter.h"
+  #include "input.h"
+  #include "cave.h"
+  #include "update.h"
 }
 
-char copter[] = {
-  0xFF, 0xFF, 0xFF,
-  0xFF, 0x00, 0xFF,
-  0xFF, 0xFF, 0xFF  
-};
+GameState *state = createGameState();
 
-void setup()  { 
+void setup()  {
   /*
    * First, Set Up the Clock.
    * Main OSC		  -> SYSCTL_OSC_MAIN
@@ -94,17 +96,18 @@ void setup()  {
    * Initialize the OLED
    */
   OrbitOledInit();
-} 
+}
 
 void render() {
   OrbitOledClear();
-  OrbitOledMoveTo(0,0);
-  OrbitOledSetCursor(0,0);
-  OrbitOledPutBmp(3, 3, copter);
+  drawCopter(state);
+  drawCave(state);
   OrbitOledUpdate();
 }
 
-void loop()  { 
+void loop()  {
+  readSensorData(state);
+  updateGameLogic(state);
   render();
-  delay(1000);  
+  DelayMs(100);
 }
