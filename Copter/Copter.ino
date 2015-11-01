@@ -97,6 +97,7 @@ void setup()  {
    */
   OrbitOledInit();
 
+  srand(0);
   state = createGameState();
 }
 
