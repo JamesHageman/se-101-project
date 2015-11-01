@@ -3,6 +3,6 @@
 
 #include "gamestate.h"
 
-void updateGameLogic(GameState *state);
+void updateGameLogic(GameState *state, double deltaTime);
 
 #endif

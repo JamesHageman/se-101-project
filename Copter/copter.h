@@ -1,8 +1,13 @@
 #ifndef COPTER_H
 #define COPTER_H
 
-#include "gamestate.h"
+typedef struct {
+  double x;
+  double y;
+} Copter;
 
-void drawCopter(GameState *state);
+Copter *createCopter();
+
+void drawCopter(Copter *copter);
 
 #endif

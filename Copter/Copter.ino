@@ -1,5 +1,4 @@
 extern "C" {
-  #include <delay.h>
   #include <FillPat.h>
   #include <I2CEEPROM.h>
   #include <LaunchPad.h>
@@ -15,6 +14,7 @@ extern "C" {
   #include "update.h"
 }
 
+clock_t lastTime = NULL;
 GameState *state = createGameState();
 
 void setup()  {
@@ -100,14 +100,30 @@ void setup()  {
 
 void render() {
   OrbitOledClear();
-  drawCopter(state);
+  OrbitOledMoveTo(0,0);
+  OrbitOledSetCursor(0,0);
+
+  drawCopter(state->copter);
   drawCave(state);
+
   OrbitOledUpdate();
 }
 
 void loop()  {
+  // This is how deltaTime should work - but I can't get the clock() to compile
+
+  // clock_t currentTime = clock();
+  // double deltaTime;
+  // if (!lastTime) {
+  //   deltaTime = 0.0;
+  // } else {
+  //   deltaTime = (double)(currentTime - lastTime) / CLOCKS_PER_SEC;
+  // }
+
+  // lastTime = currentTime;
+
   readSensorData(state);
-  updateGameLogic(state);
+  updateGameLogic(state, 0.0167); // For now, assume 60 FPS
   render();
-  DelayMs(100);
+
 }

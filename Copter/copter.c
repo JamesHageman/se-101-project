@@ -1,17 +1,27 @@
+#include <LaunchPad.h>
 #include "copter.h"
-#include <OrbitBoosterPackDefs.h>
 #include <OrbitOled.h>
+#include <OrbitOledGrph.h>
 
-// Still gotta figure out how the fuck this bmp shit works
 char CopterBmp[] = {
-  0b11100000, 0b1010000, 0b11100000, 0, 0, 0, 0, 0
+  0b00000100, 0b00000101, 0b00000111, 0b00000101
 };
 
-const int CopterWidth = 8;
-const int CopterHeight = 8;
+const int CopterWidth = 4;
+const int CopterHeight = 3;
 
-void drawCopter(GameState *state) {
-  OrbitOledMoveTo(0, 0);
-  OrbitOledSetCursor(0, state->copterY);
+Copter *createCopter()  {
+  Copter *c = malloc(sizeof(Copter));
+  c->x = 10.0;
+  c->y = 4.0;
+  return c;
+}
+
+void drawCopter(Copter *copter) {
+  int x = (int) copter->x;
+  int y = (int) copter->y;
+
+  OrbitOledMoveTo(x, y);
   OrbitOledPutBmp(CopterWidth, CopterHeight, CopterBmp);
+  // OrbitOledDrawRect(16, 4);
 }

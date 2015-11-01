@@ -2,9 +2,10 @@
 #define GAMESTATE_H
 
 #include "Energia.h"
+#include "copter.h"
 
 typedef struct {
-  int copterY;
+  Copter *copter;
 } GameState;
 
 GameState * createGameState();
