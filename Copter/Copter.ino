@@ -15,7 +15,7 @@ extern "C" {
 }
 
 clock_t lastTime = NULL;
-GameState *state = createGameState();
+GameState *state;
 
 void setup()  {
   /*
@@ -96,6 +96,8 @@ void setup()  {
    * Initialize the OLED
    */
   OrbitOledInit();
+
+  state = createGameState();
 }
 
 void render() {
@@ -123,7 +125,7 @@ void loop()  {
   // lastTime = currentTime;
 
   readSensorData(state);
-  updateGameLogic(state, 0.0167); // For now, assume 60 FPS
+  updateGameLogic(state, 1.0 / 20.0); // For now, assume 20 FPS
   render();
-
+  delay(20);
 }

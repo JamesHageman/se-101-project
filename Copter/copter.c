@@ -2,6 +2,7 @@
 #include "copter.h"
 #include <OrbitOled.h>
 #include <OrbitOledGrph.h>
+#include "constants.h"
 
 char CopterBmp[] = {
   0b00000100, 0b00000101, 0b00000111, 0b00000101
@@ -12,8 +13,8 @@ const int CopterHeight = 3;
 
 Copter *createCopter()  {
   Copter *c = malloc(sizeof(Copter));
-  c->x = 10.0;
-  c->y = 4.0;
+  c->x = MAX_WIDTH / 10;
+  c->y = MAX_HEIGHT / 2;
   return c;
 }
 

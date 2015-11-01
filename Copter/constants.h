@@ -1,0 +1,11 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#define MAX_WIDTH 128
+#define MAX_HEIGHT 32
+
+#define CAVE_COLUMN_WIDTH 4
+#define CAVE_GAP_HEIGHT 20
+#define NUM_CAVE_COLUMNS (MAX_WIDTH / CAVE_COLUMN_WIDTH)
+
+#endif

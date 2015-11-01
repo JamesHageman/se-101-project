@@ -1,10 +1,11 @@
 #include "Energia.h"
 #include "gamestate.h"
 #include "update.h"
+#include "constants.h"
 
 void updateGameLogic(GameState *state, double deltaTime) {
-  state->copter->x += 6 * deltaTime;
-  if (state->copter->x > 100) {
-    state->copter->x = 0;
+  state->copter->y += 4 * deltaTime;
+  if (state->copter->y > MAX_HEIGHT - 3) {
+    state->copter->y = 0;
   }
 }
