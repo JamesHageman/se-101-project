@@ -4,8 +4,19 @@
 #include <OrbitOledGrph.h>
 #include "constants.h"
 
+/*
+Copter:
+
+ ***
+  *
+****
+ */
+
 char CopterBmp[] = {
-  0b00000100, 0b00000101, 0b00000111, 0b00000101
+  0b00000100,
+  0b00000101,
+  0b00000111,
+  0b00000101
 };
 
 const int CopterWidth = 4;
