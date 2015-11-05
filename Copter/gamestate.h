@@ -8,6 +8,7 @@
 typedef struct {
   Copter *copter;
   int caveColumns[NUM_CAVE_COLUMNS];
+  double cavePosition;
 } GameState;
 
 GameState * createGameState();

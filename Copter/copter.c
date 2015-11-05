@@ -24,7 +24,7 @@ const int CopterHeight = 3;
 
 Copter *createCopter()  {
   Copter *c = malloc(sizeof(Copter));
-  c->x = MAX_WIDTH / 10;
+  c->x = MAX_WIDTH / 5;
   c->y = MAX_HEIGHT / 2;
   return c;
 }

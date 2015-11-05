@@ -8,6 +8,7 @@ GameState * createGameState() {
   int i;
   GameState *state = (GameState *) malloc(sizeof(GameState));
 
+  state->cavePosition = 0.0;
   state->copter = createCopter();
 
   for (i = 0; i < NUM_CAVE_COLUMNS; i++) {
