@@ -10,7 +10,7 @@ GameState * createGameState() {
 
   state->cavePosition = 0.0;
   state->copter = createCopter();
-
+  state->accelY = 0;
   for (i = 0; i < NUM_CAVE_COLUMNS; i++) {
     state->caveColumns[i] = rand() % CAVE_MAX_COLUMN_HEIGHT;
   }
