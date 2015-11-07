@@ -67,8 +67,32 @@ void createCave(GameState *state) {
 void shiftCave(GameState *state){
   int i=0, j=0, x=0, c=0;
   for( i=0; i<MAX_HEIGHT; i++){
-        for( j=0; j<MAX_WIDTH-1; j++){
-            state->caveObject[i][j] = state->caveObject[i][j+1];
+        for( j=0; j<MAX_WIDTH; j++){
+            state->caveObject[i][j] = state->caveObject[i][j+1]; 
+        }
+
+      //clear the last column
+        state->caveObject[i][127] = '.';
+    }
+    
+    int foundLine = 0;
+    for( i=0; i<MAX_HEIGHT && foundLine == 0; i++){
+        if(state->caveObject[i][126] == '#' && state->caveObject[i][125] == '#' && state->caveObject[i][124] == '#' && state->caveObject[i][123] == '#' ){
+           int sign = rand() % 2;
+            int icopy = i;
+
+            if (sign == 1 && icopy < 9) //go down 1, with limit 10 down as max
+                icopy +=1;
+            else if(i>0)
+                icopy -=1; 
+            state->caveObject[icopy][127] = '#';
+            state->caveObject[icopy +22][127] = '#';
+            foundLine = 1;
+        } else if(state->caveObject[i][126] == '#' ) {
+            state->caveObject[i][127] = '#'; //keep going
         }
     }
+    
+    
+    
 }
