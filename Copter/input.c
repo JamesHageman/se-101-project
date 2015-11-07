@@ -190,36 +190,36 @@ void readSensorData(GameState* state) {
 
   bool fDir = true;
 
+  if(state->accelInitialized == 0){
+    /*
+     * Enable I2C Peripheral
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
+    SysCtlPeripheralReset(SYSCTL_PERIPH_I2C0);
 
-  /*
-   * Enable I2C Peripheral
-   */
-  SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
-  SysCtlPeripheralReset(SYSCTL_PERIPH_I2C0);
+    /*
+     * Set I2C GPIO pins
+     */
+    GPIOPinTypeI2C(I2CSDAPort, I2CSDA_PIN);
+    GPIOPinTypeI2CSCL(I2CSCLPort, I2CSCL_PIN);
+    GPIOPinConfigure(I2CSCL);
+    GPIOPinConfigure(I2CSDA);
 
-  /*
-   * Set I2C GPIO pins
-   */
-  GPIOPinTypeI2C(I2CSDAPort, I2CSDA_PIN);
-  GPIOPinTypeI2CSCL(I2CSCLPort, I2CSCL_PIN);
-  GPIOPinConfigure(I2CSCL);
-  GPIOPinConfigure(I2CSDA);
+    /*
+     * Setup I2C
+     */
+    I2CMasterInitExpClk(I2C0_BASE, SysCtlClockGet(), false);
 
-  /*
-   * Setup I2C
-   */
-  I2CMasterInitExpClk(I2C0_BASE, SysCtlClockGet(), false);
+    /* Initialize the Accelerometer
+     *
+     */
+    GPIOPinTypeGPIOInput(ACCL_INT2Port, ACCL_INT2);
 
-  /* Initialize the Accelerometer
-   *
-   */
-  GPIOPinTypeGPIOInput(ACCL_INT2Port, ACCL_INT2);
-
-  rgchWriteAccl[0] = chPwrCtlReg;
-  rgchWriteAccl[1] = 1 << 3;    // sets Accl in measurement mode
-  I2CGenTransmit(rgchWriteAccl, 1, WRITE, ACCLADDR);
-
-
+    rgchWriteAccl[0] = chPwrCtlReg;
+    rgchWriteAccl[1] = 1 << 3;    // sets Accl in measurement mode
+    I2CGenTransmit(rgchWriteAccl, 1, WRITE, ACCLADDR);
+    state->accelInitialized = 1;
+  }
 
 
 

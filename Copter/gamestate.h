@@ -10,6 +10,7 @@ typedef struct {
   int caveColumns[NUM_CAVE_COLUMNS];
   double cavePosition;
   double accelY;
+  int accelInitialized;
 } GameState;
 
 GameState * createGameState();

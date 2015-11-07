@@ -7,7 +7,7 @@
 GameState * createGameState() {
   int i;
   GameState *state = (GameState *) malloc(sizeof(GameState));
-
+  state->accelInitialized = 0;
   state->cavePosition = 0.0;
   state->copter = createCopter();
   state->accelY = 0;
