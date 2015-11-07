@@ -177,25 +177,25 @@ bool I2CGenIsNotIdle() {
 
 
 void readSensorData() {
-short	dataX;
+  short	dataX;
   short dataY;
   short dataZ;
-  
+
   char printVal[10];
-  
+
   char 	chPwrCtlReg = 0x2D;
   char 	chX0Addr = 0x32;
   char  chY0Addr = 0x34;
   char  chZ0Addr = 0x36;
-  
+
   char 	rgchReadAccl[] = {
     0, 0, 0            };
   char 	rgchWriteAccl[] = {
     0, 0            };
-    
+
   char rgchReadAccl2[] = {
     0, 0, 0            };
-    
+
     char rgchReadAccl3[] = {
     0, 0, 0            };
 
@@ -203,59 +203,53 @@ short	dataX;
 	int		xDirThreshNeg = -50;
 
 	bool fDir = true;
-  
-    OrbitOledClear();
-    OrbitOledMoveTo(0,0);
-    OrbitOledSetCursor(0,0);
- 
 
-    /*
-     * Enable I2C Peripheral
-     */
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
-    SysCtlPeripheralReset(SYSCTL_PERIPH_I2C0);
 
-    /*
-     * Set I2C GPIO pins
-     */
-    GPIOPinTypeI2C(I2CSDAPort, I2CSDA_PIN);
-    GPIOPinTypeI2CSCL(I2CSCLPort, I2CSCL_PIN);
-    GPIOPinConfigure(I2CSCL);
-    GPIOPinConfigure(I2CSDA);
+  /*
+   * Enable I2C Peripheral
+   */
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
+  SysCtlPeripheralReset(SYSCTL_PERIPH_I2C0);
 
-    /*
-     * Setup I2C
-     */
-    I2CMasterInitExpClk(I2C0_BASE, SysCtlClockGet(), false);
+  /*
+   * Set I2C GPIO pins
+   */
+  GPIOPinTypeI2C(I2CSDAPort, I2CSDA_PIN);
+  GPIOPinTypeI2CSCL(I2CSCLPort, I2CSCL_PIN);
+  GPIOPinConfigure(I2CSCL);
+  GPIOPinConfigure(I2CSDA);
 
-    /* Initialize the Accelerometer
-     *
-     */
-    GPIOPinTypeGPIOInput(ACCL_INT2Port, ACCL_INT2);
+  /*
+   * Setup I2C
+   */
+  I2CMasterInitExpClk(I2C0_BASE, SysCtlClockGet(), false);
 
-    rgchWriteAccl[0] = chPwrCtlReg;
-    rgchWriteAccl[1] = 1 << 3;		// sets Accl in measurement mode
-    I2CGenTransmit(rgchWriteAccl, 1, WRITE, ACCLADDR);
+  /* Initialize the Accelerometer
+   *
+   */
+  GPIOPinTypeGPIOInput(ACCL_INT2Port, ACCL_INT2);
 
-  
- 
-    
-    
-    rgchReadAccl[0] = chX0Addr;
-    rgchReadAccl2[0] = chY0Addr;
-    rgchReadAccl3[0] = chZ0Addr;
-    
-    I2CGenTransmit(rgchReadAccl, 2, READ, ACCLADDR);
-    I2CGenTransmit(rgchReadAccl2, 2, READ, ACCLADDR);
-    I2CGenTransmit(rgchReadAccl3, 2, READ, ACCLADDR);
-    
-    dataX = (rgchReadAccl[2] << 8) | rgchReadAccl[1];
-    dataY = (rgchReadAccl2[2] << 8) | rgchReadAccl2[1];
-    dataZ = (rgchReadAccl3[2] << 8) | rgchReadAccl2[1];
-    
-    state->accelY = dataY;
+  rgchWriteAccl[0] = chPwrCtlReg;
+  rgchWriteAccl[1] = 1 << 3;		// sets Accl in measurement mode
+  I2CGenTransmit(rgchWriteAccl, 1, WRITE, ACCLADDR);
 
-    
+
+
+
+
+  rgchReadAccl[0] = chX0Addr;
+  rgchReadAccl2[0] = chY0Addr;
+  rgchReadAccl3[0] = chZ0Addr;
+
+  I2CGenTransmit(rgchReadAccl, 2, READ, ACCLADDR);
+  I2CGenTransmit(rgchReadAccl2, 2, READ, ACCLADDR);
+  I2CGenTransmit(rgchReadAccl3, 2, READ, ACCLADDR);
+
+  dataX = (rgchReadAccl[2] << 8) | rgchReadAccl[1];
+  dataY = (rgchReadAccl2[2] << 8) | rgchReadAccl2[1];
+  dataZ = (rgchReadAccl3[2] << 8) | rgchReadAccl2[1];
+
+  state->accelY = dataY;
 
 }
 
@@ -346,9 +340,13 @@ void setup()  {
 }
 
 void render() {
-  OrbitOledClear();
+  // OrbitOledClear();
   OrbitOledMoveTo(0,0);
   OrbitOledSetCursor(0,0);
+
+  OrbitOledSetFillPattern(OrbitOledGetStdPattern(0));
+  OrbitOledFillRect(MAX_WIDTH, MAX_HEIGHT);
+  OrbitOledSetFillPattern(OrbitOledGetStdPattern(1));
 
   drawCopter(state->copter);
   drawCave(state);
@@ -372,7 +370,7 @@ void loop()  {
   readSensorData();
   updateGameLogic(state, 1.0 / 20.0); // For now, assume 20 FPS
   render();
-  delay(20);
+  // delay(20);
 }
 
 
