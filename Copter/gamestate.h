@@ -8,6 +8,7 @@
 typedef struct {
   Copter *copter;
   int caveColumns[NUM_CAVE_COLUMNS];
+  char caveObject[MAX_HEIGHT][MAX_WIDTH];
   double cavePosition;
   double accelY;
   int accelInitialized;

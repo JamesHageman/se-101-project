@@ -104,6 +104,7 @@ void setup()  {
 
   srand(0);
   state = createGameState();
+    createCave(state);
 }
 
 void render() {
@@ -116,6 +117,7 @@ void render() {
   OrbitOledSetFillPattern(OrbitOledGetStdPattern(1));
 
   drawCopter(state->copter);
+  shiftCave(state);
   drawCave(state);
 
   OrbitOledUpdate();

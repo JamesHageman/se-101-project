@@ -5,30 +5,70 @@
 #include "constants.h"
 
 void drawCave(GameState *state) {
-  int start = (int)state->cavePosition % MAX_WIDTH;
-  int i;
-  for (i = 0; i < NUM_CAVE_COLUMNS; i++) {
-    int x = (MAX_WIDTH + i * CAVE_COLUMN_WIDTH - start) % MAX_WIDTH;
-    int x2 = x + CAVE_COLUMN_WIDTH;
-    int topHeight = state->caveColumns[i];
-    int bottomHeight = topHeight + CAVE_GAP_HEIGHT;
-
-    OrbitOledSetFillPattern(OrbitOledGetStdPattern(1));
-
-    OrbitOledMoveTo(x, topHeight);
-    OrbitOledLineTo(x2, topHeight);
-
-    OrbitOledMoveTo(x, bottomHeight);
-    OrbitOledLineTo(x2, bottomHeight);
-
-    if (x2 < MAX_WIDTH) {
-      // Draw vertical lines joining columns
-      int nextTopHeight = state->caveColumns[(i + 1) % NUM_CAVE_COLUMNS];
-      OrbitOledMoveTo(x2, topHeight);
-      OrbitOledLineTo(x2, nextTopHeight);
-
-      OrbitOledMoveTo(x2, bottomHeight);
-      OrbitOledLineTo(x2, nextTopHeight + CAVE_GAP_HEIGHT);
+    int i=0, j=0, x=0, c=0;
+  for( i=0; i<MAX_HEIGHT; i++){
+        for( j=0; j<MAX_WIDTH; j++){
+            if(state->caveObject[i][j] == '#' ){
+                OrbitOledMoveTo(j,i); 
+                OrbitOledDrawPixel();
+            }
+        }
+        
     }
-  }
+
+}
+
+void createCave(GameState *state) {
+    srand(1);
+    int i=0, j=0, x=0, c=0;
+    int shift = 0;
+   
+    for( i=0; i<MAX_HEIGHT; i++){
+        for( j=0; j<MAX_WIDTH; j++){
+            state->caveObject[i][j] = '.';
+        }
+    }
+    int y=0;
+    int lineLength = 8;
+    //iterate through each horizontal line of the cave
+    for( x = 0; x<MAX_WIDTH/lineLength; x++){
+        
+        int sign = rand() % 2;
+        
+        
+        if (sign == 1 && y < 10) //go down 1, with limit 10 down as max
+            y += 1;
+        else if(y>0)
+            y -= 1;
+
+        //loop to draw line segement of cave
+        for( c=0; c<lineLength; c++){
+            //printf(" x: %d y: %d \n", x*lineLength+c, y );
+            state->caveObject[y][x*lineLength+c] = '#';
+            
+            state->caveObject[y+22][x*lineLength+c] = '#';
+        }
+        
+    }
+    
+    //add obstacles to cave
+    int lineHeight = 4;
+    for (i = 0; i < MAX_WIDTH/64; i++){
+        //draw vertical line at random height
+        int heightFromTop = rand() % MAX_HEIGHT/2;
+        //loop through vertical line
+        for( j=0; j<lineHeight; j++){
+            state->caveObject[j+heightFromTop][i*64] = '#';
+        }
+    }
+    
+}
+
+void shiftCave(GameState *state){
+  int i=0, j=0, x=0, c=0;
+  for( i=0; i<MAX_HEIGHT; i++){
+        for( j=0; j<MAX_WIDTH-1; j++){
+            state->caveObject[i][j] = state->caveObject[i][j+1];
+        }
+    }
 }
