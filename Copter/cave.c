@@ -90,7 +90,7 @@ void shiftCave(GameState *state){
                 icopy -=1;
             state->caveObject[icopy][127] = '#';
             state->caveObject[icopy +22][127] = '#';
-            foundLine = 1;
+            foundLine = 1+i;
         } else if(state->caveObject[i][126] == '#' ) {
             state->caveObject[i][127] = '#'; //keep going
         }
@@ -101,11 +101,11 @@ void shiftCave(GameState *state){
         state->obstacleOnScreen = 1;
         int lineHeight = 4;
         //draw vertical line at random height
-        int heightFromTop = rand() % MAX_HEIGHT/2;
+        int heightFromTop = rand() % 22-lineHeight;
         //loop through vertical line
         for( v=0; v<lineHeight; v++){
 
-            state->caveObject[v+heightFromTop][125] = '#';
+            state->caveObject[v+heightFromTop + foundLine][125] = '#';
         }
 
     }
