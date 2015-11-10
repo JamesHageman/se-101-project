@@ -19,7 +19,7 @@ typedef struct {
   long Btn1;
   long Btn2;
 
-  unsigned long ulAIN0;
+  unsigned long Ptnt;
 
 } GameState;
 

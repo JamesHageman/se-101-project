@@ -12,7 +12,7 @@ GameState * createGameState() {
     state->obstacleOnScreen = 0;
   state->copter = createCopter();
 
-  // Sensor Data
+  // --- Sensor Data ---
   // Accelerometer
   state->accelInitialized = 0;
   state->accelY = 0;
@@ -26,7 +26,7 @@ GameState * createGameState() {
   state->Btn2 = 0;
 
   // Potentiometer
-  state->ulAIN0 = 0;
+  state->Ptnt = 0;
 
   return state;
 }

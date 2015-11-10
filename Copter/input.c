@@ -1,27 +1,10 @@
 #include "Energia.h"
 #include "input.h"
 
-/* ------------------------------------------------------------ */
-/***  I2CGenIsNotIdle()
-**
-**  Parameters:
-**    pbData  - Pointer to transmit buffer (read or write)
-**    cSize - Number of byte transactions to take place
-**
-**  Return Value:
-**    TRUE is bus is not idle, FALSE if bus is idle
-**
-**  Errors:
-**    none
-**
-**  Description:
-**    Returns TRUE if the bus is not idle
-**
-*/
+// Magical code that makes the accelerometer work
 bool I2CGenIsNotIdle() {
   return !I2CMasterBusBusy(I2C0_BASE);
 }
-
 char I2CGenTransmit(char * pbData, int cSize, bool fRW, char bAddr) {
   int i;
   char *pbTemp;
@@ -123,61 +106,22 @@ void readSensorData(GameState* state) {
   short dataY;
   short dataZ;
 
-  char printVal[10];
+  char chPwrCtlReg = 0x2D;
+  char chX0Addr = 0x32;
+  char chY0Addr = 0x34;
+  char chZ0Addr = 0x36;
 
-  char  chPwrCtlReg = 0x2D;
-  char  chX0Addr = 0x32;
-  char  chY0Addr = 0x34;
-  char  chZ0Addr = 0x36;
-
-  char  rgchReadAccl[] = {
-    0, 0, 0            };
-  char  rgchWriteAccl[] = {
-    0, 0            };
-
-  char rgchReadAccl2[] = {
-    0, 0, 0            };
-
-    char rgchReadAccl3[] = {
-    0, 0, 0            };
-
-  int   xDirThreshPos = 50;
-  int   xDirThreshNeg = -50;
-
-  bool fDir = true;
+  char rgchReadAccl [] = {0, 0, 0};
+  char rgchReadAccl2[] = {0, 0, 0};
+  char rgchReadAccl3[] = {0, 0, 0};
 
   if(state->accelInitialized == 0){
-    /*
-     * Enable I2C Peripheral
-     */
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
-    SysCtlPeripheralReset(SYSCTL_PERIPH_I2C0);
-
-    /*
-     * Set I2C GPIO pins
-     */
-    GPIOPinTypeI2C(I2CSDAPort, I2CSDA_PIN);
-    GPIOPinTypeI2CSCL(I2CSCLPort, I2CSCL_PIN);
-    GPIOPinConfigure(I2CSCL);
-    GPIOPinConfigure(I2CSDA);
-
-    /*
-     * Setup I2C
-     */
-    I2CMasterInitExpClk(I2C0_BASE, SysCtlClockGet(), false);
-
-    /* Initialize the Accelerometer
-     *
-     */
-    GPIOPinTypeGPIOInput(ACCL_INT2Port, ACCL_INT2);
-
+    char rgchWriteAccl[] = {0, 0};
     rgchWriteAccl[0] = chPwrCtlReg;
     rgchWriteAccl[1] = 1 << 3;    // sets Accl in measurement mode
     I2CGenTransmit(rgchWriteAccl, 1, WRITE, ACCLADDR);
     state->accelInitialized = 1;
   }
-
-
 
   rgchReadAccl[0] = chX0Addr;
   rgchReadAccl2[0] = chY0Addr;
@@ -194,14 +138,6 @@ void readSensorData(GameState* state) {
   state->accelY = dataY;
   // } ACCELEROMETOR VOODOO OVER
 
-  // POTENTIOMETER VOODOO {
-
-  // ummmmm
-  char      szAIN[6] = {0};
-  char      cMSB = 0x00;
-  char      cMIDB = 0x00;
-  char      cLSB = 0x00;
-
   // Get button state
   state->Swt1 = GPIOPinRead(SWT1Port, SWT1);
   state->Swt2 = GPIOPinRead(SWT2Port, SWT2);
@@ -211,26 +147,11 @@ void readSensorData(GameState* state) {
   // Get Potentiometer State
   ADCProcessorTrigger(ADC0_BASE, 0);
   while(!ADCIntStatus(ADC0_BASE, 0, false));
-  ADCSequenceDataGet(ADC0_BASE, 0, &(state->ulAIN0));
+  ADCSequenceDataGet(ADC0_BASE, 0, &(state->Ptnt));
 
-  /*
-   * Process data
-   */
-  cMSB = (0xF00 & state->ulAIN0) >> 8;
-  cMIDB = (0x0F0 & state->ulAIN0) >> 4;
-  cLSB = (0x00F & state->ulAIN0);
-
-  szAIN[0] = '0';
-  szAIN[1] = 'x';
-  szAIN[2] = (cMSB > 9) ? 'A' + (cMSB - 10) : '0' + cMSB;
-  szAIN[3] = (cMIDB > 9) ? 'A' + (cMIDB - 10) : '0' + cMIDB;
-  szAIN[4] = (cLSB > 9) ? 'A' + (cLSB - 10) : '0' + cLSB;
-  szAIN[5] = '\0';
-
-  // OrbitOledSetCursor(8, 4);
-  // OrbitOledPutString(szAIN);
-
-  // } POTENTIOMETER VOOODOO OVER
+  // Potentiometer is a ulong from ~0 to ~10
+  // less than 10, slightly more than 0
+  state->Ptnt = state->Ptnt/400;
 }
 
 void ledControl (int led, int state) {
