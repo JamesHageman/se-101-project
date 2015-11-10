@@ -51,16 +51,6 @@ void createCave(GameState *state) {
 
     }
 
-    //add obstacles to cave
-//    int lineHeight = 4;
-//    for (i = 0; i < MAX_WIDTH/64; i++){
-//        //draw vertical line at random height
-//        int heightFromTop = rand() % MAX_HEIGHT/2;
-//        //loop through vertical line
-//        for( j=0; j<lineHeight; j++){
-//            state->caveObject[j+heightFromTop][i*64] = '#';
-//        }
-//    }
 
 }
 
@@ -79,6 +69,7 @@ void shiftCave(GameState *state){
 
 
     int foundLine = 0;
+    int linePos = 0;
     for( i=0; i<MAX_HEIGHT && foundLine == 0; i++){
         if(state->caveObject[i][126] == '#' && state->caveObject[i][125] == '#' && state->caveObject[i][124] == '#' ){
            int sign = rand() % 2;
@@ -90,24 +81,26 @@ void shiftCave(GameState *state){
                 icopy -=1;
             state->caveObject[icopy][127] = '#';
             state->caveObject[icopy +22][127] = '#';
-            foundLine = 1+i;
+            foundLine = 1;
+            linePos = i;
         } else if(state->caveObject[i][126] == '#' ) {
             state->caveObject[i][127] = '#'; //keep going
         }
     }
 
     //add obstacle
+    //DO NOT TOUCH, BLACK VOODOO MAGIC APPLIED TO MAKE IT WORK
     if(   state->obstacleOnScreen == 0){
         state->obstacleOnScreen = 1;
         int lineHeight = 4;
         //draw vertical line at random height
-        int heightFromTop = rand() % 22-lineHeight;
+        int heightFromTop = rand() % MAX_HEIGHT/2-12;
         //loop through vertical line
         for( v=0; v<lineHeight; v++){
-
-            state->caveObject[v+heightFromTop + foundLine][125] = '#';
+            if(heightFromTop < linePos)
+                heightFromTop = linePos;
+            state->caveObject[v+heightFromTop+12][125] = '#';
         }
-
     }
 
     if( state->cavePosition %128 == 0){
