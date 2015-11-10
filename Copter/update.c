@@ -20,6 +20,4 @@ void updateGameLogic(GameState *state, double deltaTime) {
   //collision detection alogirthm here
     int coptH = 3;
     int coptW = 4;
-    
-    
 }

@@ -5,17 +5,28 @@
 #include <stdlib.h>
 
 GameState * createGameState() {
-  int i;
   GameState *state = (GameState *) malloc(sizeof(GameState));
-  state->accelInitialized = 0;
+
   state->cavePosition = 0;
   state->caveObject;
     state->obstacleOnScreen = 0;
   state->copter = createCopter();
+
+  // Sensor Data
+  // Accelerometer
+  state->accelInitialized = 0;
   state->accelY = 0;
-  for (i = 0; i < NUM_CAVE_COLUMNS; i++) {
-    state->caveColumns[i] = rand() % CAVE_MAX_COLUMN_HEIGHT;
-  }
+
+  // Switches
+  state->Swt1 = 0;
+  state->Swt2 = 0;
+
+  // Buttons
+  state->Btn1 = 0;
+  state->Btn2 = 0;
+
+  // Potentiometer
+  state->ulAIN0 = 0;
 
   return state;
 }

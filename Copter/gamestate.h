@@ -13,6 +13,14 @@ typedef struct {
   int cavePosition;
   double accelY;
   int accelInitialized;
+
+  long Swt1;
+  long Swt2;
+  long Btn1;
+  long Btn2;
+
+  unsigned long ulAIN0;
+
 } GameState;
 
 GameState * createGameState();

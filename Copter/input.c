@@ -19,142 +19,97 @@
 **
 */
 bool I2CGenIsNotIdle() {
-
   return !I2CMasterBusBusy(I2C0_BASE);
-
 }
 
-
 char I2CGenTransmit(char * pbData, int cSize, bool fRW, char bAddr) {
-
-  int     i;
-  char *    pbTemp;
-
+  int i;
+  char *pbTemp;
   pbTemp = pbData;
-
   /*Start*/
-
   /*Send Address High Byte*/
   /* Send Write Block Cmd
   */
   I2CMasterSlaveAddrSet(I2C0_BASE, bAddr, WRITE);
   I2CMasterDataPut(I2C0_BASE, *pbTemp);
-
   I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_START);
-
   DelayMs(1);
-
   /* Idle wait
   */
   while(I2CGenIsNotIdle());
-
   /* Increment data pointer
   */
   pbTemp++;
-
   /*Execute Read or Write*/
-
   if(fRW == READ) {
-
     /* Resend Start condition
     ** Then send new control byte
     ** then begin reading
     */
     I2CMasterSlaveAddrSet(I2C0_BASE, bAddr, READ);
-
     while(I2CMasterBusy(I2C0_BASE));
-
     /* Begin Reading
     */
     for(i = 0; i < cSize; i++) {
-
       if(cSize == i + 1 && cSize == 1) {
         I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_SINGLE_RECEIVE);
-
         DelayMs(1);
-
         while(I2CMasterBusy(I2C0_BASE));
       }
       else if(cSize == i + 1 && cSize > 1) {
         I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
-
         DelayMs(1);
-
         while(I2CMasterBusy(I2C0_BASE));
       }
       else if(i == 0) {
         I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_RECEIVE_START);
-
         DelayMs(1);
-
         while(I2CMasterBusy(I2C0_BASE));
-
         /* Idle wait
         */
         while(I2CGenIsNotIdle());
       }
       else {
         I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_RECEIVE_CONT);
-
         DelayMs(1);
-
         while(I2CMasterBusy(I2C0_BASE));
-
         /* Idle wait
         */
         while(I2CGenIsNotIdle());
       }
-
       while(I2CMasterBusy(I2C0_BASE));
-
       /* Read Data
       */
       *pbTemp = (char)I2CMasterDataGet(I2C0_BASE);
-
       pbTemp++;
-
     }
-
   }
   else if(fRW == WRITE) {
-
     /*Loop data bytes
     */
     for(i = 0; i < cSize; i++) {
       /* Send Data
       */
       I2CMasterDataPut(I2C0_BASE, *pbTemp);
-
       while(I2CMasterBusy(I2C0_BASE));
-
       if(i == cSize - 1) {
         I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_FINISH);
-
         DelayMs(1);
-
         while(I2CMasterBusy(I2C0_BASE));
       }
       else {
         I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_CONT);
-
         DelayMs(1);
-
         while(I2CMasterBusy(I2C0_BASE));
-
         /* Idle wait
         */
         while(I2CGenIsNotIdle());
       }
-
       pbTemp++;
     }
-
   }
-
-/*Stop*/
-
+  /*Stop*/
   return 0x00;
-
 }
 
 
@@ -163,6 +118,7 @@ char I2CGenTransmit(char * pbData, int cSize, bool fRW, char bAddr) {
 
 
 void readSensorData(GameState* state) {
+  // ACCELEROMETOR VOODOO {
   short dataX;
   short dataY;
   short dataZ;
@@ -236,5 +192,60 @@ void readSensorData(GameState* state) {
   dataZ = (rgchReadAccl3[2] << 8) | rgchReadAccl2[1];
 
   state->accelY = dataY;
+  // } ACCELEROMETOR VOODOO OVER
 
+  // POTENTIOMETER VOODOO {
+
+  // ummmmm
+  char      szAIN[6] = {0};
+  char      cMSB = 0x00;
+  char      cMIDB = 0x00;
+  char      cLSB = 0x00;
+
+  // Get button state
+  state->Swt1 = GPIOPinRead(SWT1Port, SWT1);
+  state->Swt2 = GPIOPinRead(SWT2Port, SWT2);
+  state->Btn1 = GPIOPinRead(BTN1Port, BTN1);
+  state->Btn2 = GPIOPinRead(BTN2Port, BTN2);
+
+  // Get Potentiometer State
+  ADCProcessorTrigger(ADC0_BASE, 0);
+  while(!ADCIntStatus(ADC0_BASE, 0, false));
+  ADCSequenceDataGet(ADC0_BASE, 0, &(state->ulAIN0));
+
+  /*
+   * Process data
+   */
+  cMSB = (0xF00 & state->ulAIN0) >> 8;
+  cMIDB = (0x0F0 & state->ulAIN0) >> 4;
+  cLSB = (0x00F & state->ulAIN0);
+
+  szAIN[0] = '0';
+  szAIN[1] = 'x';
+  szAIN[2] = (cMSB > 9) ? 'A' + (cMSB - 10) : '0' + cMSB;
+  szAIN[3] = (cMIDB > 9) ? 'A' + (cMIDB - 10) : '0' + cMIDB;
+  szAIN[4] = (cLSB > 9) ? 'A' + (cLSB - 10) : '0' + cLSB;
+  szAIN[5] = '\0';
+
+  // OrbitOledSetCursor(8, 4);
+  // OrbitOledPutString(szAIN);
+
+  // } POTENTIOMETER VOOODOO OVER
+}
+
+void ledControl (int led, int state) {
+  switch (led) {
+    case 1:
+      GPIOPinWrite(LED1Port, LED1, (state)?(LED1):(LOW));
+      break;
+    case 2:
+      GPIOPinWrite(LED2Port, LED2, (state)?(LED2):(LOW));
+      break;
+    case 3:
+      GPIOPinWrite(LED3Port, LED3, (state)?(LED3):(LOW));
+      break;
+    case 4:
+      GPIOPinWrite(LED4Port, LED4, (state)?(LED4):(LOW));
+      break;
+  }
 }
