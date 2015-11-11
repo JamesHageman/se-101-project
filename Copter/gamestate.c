@@ -28,5 +28,11 @@ GameState * createGameState() {
   // Potentiometer
   state->Ptnt = 0;
 
+  // Game Over
+  state->gameOver = 0;
+
+  // Score
+  state->score = 0;
+
   return state;
 }
