@@ -1,5 +1,5 @@
 #include "Energia.h"
-#include "hardware.h"
+#include "output.h"
 
 void ledControl (int led, int state) {
   switch (led) {

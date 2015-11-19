@@ -12,7 +12,7 @@ typedef struct {
   // Cave Related
   int caveColumns[NUM_CAVE_COLUMNS];
   char caveObject[MAX_HEIGHT][MAX_WIDTH];
-    int obstacleOnScreen;
+  int obstacleOnScreen;
   int cavePosition;
 
   // Sensors

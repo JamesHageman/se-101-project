@@ -7,13 +7,14 @@ extern "C" {
   #include <OrbitOledChar.h>
   #include <OrbitOledGrph.h>
 
-  #include	"delay.h"
+  #include "delay.h"
 
   #include "gamestate.h"
   #include "copter.h"
   #include "input.h"
   #include "cave.h"
   #include "update.h"
+  #include "print.h"
 }
 
 clock_t lastTime = NULL;
@@ -220,8 +221,17 @@ void setup()  {
   srand(0);
   state = createGameState();
     createCave(state);
+    
+    long lBtn1;
+    long lBtn2;
+    printStart();
+     
+    do {
+      lBtn1 = GPIOPinRead(BTN1Port, BTN1);
+      lBtn2 = GPIOPinRead(BTN2Port, BTN2);
+    } while (lBtn1 != BTN1 && lBtn2 != BTN2);
 }
-
+  
 void render() {
   // OrbitOledClear();
   OrbitOledMoveTo(0,0);
@@ -255,6 +265,15 @@ void loop()  {
 
   readSensorData(state);
   updateGameLogic(state, (2.0 - SPEED/10) / 20); // For now, assume 20 FPS
+  
+  //If collision is detected (gameover)
+  if (state->gameOver == 1)
+  {
+    printGameOver(state->score);
+    delay(5000);
+    setup();
+  }
+  
   render();
   delay(10-SPEED);
 }

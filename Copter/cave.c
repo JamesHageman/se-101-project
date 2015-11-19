@@ -5,7 +5,7 @@
 #include "constants.h"
 
 void drawCave(GameState *state) {
-    int i=0, j=0, x=0, c=0;
+  int i=0, j=0, x=0, c=0;
   for( i=0; i<MAX_HEIGHT; i++){
         for( j=0; j<MAX_WIDTH; j++){
             if(state->caveObject[i][j] == '#' ){
@@ -13,9 +13,7 @@ void drawCave(GameState *state) {
                 OrbitOledDrawPixel();
             }
         }
-
     }
-
 }
 
 void createCave(GameState *state) {
