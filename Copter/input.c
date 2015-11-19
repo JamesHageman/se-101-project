@@ -97,45 +97,30 @@ char I2CGenTransmit(char * pbData, int cSize, bool fRW, char bAddr) {
 
 
 
-
-
-
 void readSensorData(GameState* state) {
   // ACCELEROMETOR VOODOO {
-  short dataX;
-  short dataY;
-  short dataZ;
+  short data;
 
   char chPwrCtlReg = 0x2D;
-  char chX0Addr = 0x32;
   char chY0Addr = 0x34;
-  char chZ0Addr = 0x36;
-
-  char rgchReadAccl [] = {0, 0, 0};
-  char rgchReadAccl2[] = {0, 0, 0};
-  char rgchReadAccl3[] = {0, 0, 0};
+  char rgchReadAccl[] = {0, 0, 0};
 
   if(state->accelInitialized == 0){
     char rgchWriteAccl[] = {0, 0};
     rgchWriteAccl[0] = chPwrCtlReg;
     rgchWriteAccl[1] = 1 << 3;    // sets Accl in measurement mode
     I2CGenTransmit(rgchWriteAccl, 1, WRITE, ACCLADDR);
+    
     state->accelInitialized = 1;
   }
 
-  rgchReadAccl[0] = chX0Addr;
-  rgchReadAccl2[0] = chY0Addr;
-  rgchReadAccl3[0] = chZ0Addr;
+  rgchReadAccl[0] = chY0Addr;
 
   I2CGenTransmit(rgchReadAccl, 2, READ, ACCLADDR);
-  I2CGenTransmit(rgchReadAccl2, 2, READ, ACCLADDR);
-  I2CGenTransmit(rgchReadAccl3, 2, READ, ACCLADDR);
 
-  dataX = (rgchReadAccl[2] << 8) | rgchReadAccl[1];
-  dataY = (rgchReadAccl2[2] << 8) | rgchReadAccl2[1];
-  dataZ = (rgchReadAccl3[2] << 8) | rgchReadAccl2[1];
+  data = (rgchReadAccl[2] << 8) | rgchReadAccl[1];
 
-  state->accelY = dataY;
+  state->accelY = data;
   // } ACCELEROMETOR VOODOO OVER
 
   // Get button state

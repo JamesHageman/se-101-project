@@ -4,6 +4,9 @@
 #include "constants.h"
 #include "output.h"
 
+int brightness = 0;
+int fadeAmount = 5;
+
 void updateGameLogic(GameState *state, double deltaTime) {
   //state->cavePosition += 10 * deltaTime;
 
@@ -30,27 +33,38 @@ void updateGameLogic(GameState *state, double deltaTime) {
     }
   }
 
+
   if (state->Swt1 != 0) { // having switch 1 on == GODMODE!
     state->gameOver = 0;
-  }
 
-  // if (state->gameOver) {
-  //   ledControl(4,1);
-  // } else ledControl(4,0);
+    analogWrite(GREEN_LED, brightness);    
+    // change the brightness for next time through the loop:
+    brightness = brightness + fadeAmount;
+
+    // reverse the direction of the fading at the ends of the fade: 
+    if (brightness == 0 || brightness == 255) {
+      fadeAmount = -fadeAmount ; 
+    }
+  } else {
+    analogWrite(GREEN_LED, 0);
+  }
 
   // update score
   state->score += (state->Ptnt / 10.0)*1; // modified by speed of game
 
-  // I LIKE IT WHEN LEDS LIGHT UP FAM
-  if (state->score > 200) ledControl(4,1);
+  // give people reating room
+  if (state->score < 50) state->gameOver = 0;
+
+  // I LIKE IT WHEN THE LEDS LIGHT UP FAM
+  if (state->score > 100) ledControl(4,1);
   else ledControl(4,0);
 
-  if (state->score > 400) ledControl(3,1);
+  if (state->score > 500) ledControl(3,1);
   else ledControl(3,0);
 
-  if (state->score > 600) ledControl(2,1);
+  if (state->score > 1000) ledControl(2,1);
   else ledControl(2,0);
 
-  if (state->score > 800) ledControl(1,1);
+  if (state->score > 2000) ledControl(1,1);
   else ledControl(1,0);
 }

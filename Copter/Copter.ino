@@ -1,13 +1,5 @@
 extern "C" {
-  #include <FillPat.h>
-  #include <I2CEEPROM.h>
-  #include <LaunchPad.h>
-  #include <OrbitBoosterPackDefs.h>
-  #include <OrbitOled.h>
-  #include <OrbitOledChar.h>
-  #include <OrbitOledGrph.h>
-
-  #include "delay.h"
+  #include <delay.h>
 
   #include "gamestate.h"
   #include "copter.h"
@@ -17,104 +9,11 @@ extern "C" {
   #include "print.h"
 }
 
-clock_t lastTime = NULL;
 GameState *state;
 
-// Magical code that makes the accelerometer work
-bool I2CGenIsNotIdle() {
-  return !I2CMasterBusBusy(I2C0_BASE);
-}
-char I2CGenTransmit(char * pbData, int cSize, bool fRW, char bAddr) {
-  int i;
-  char *pbTemp;
-  pbTemp = pbData;
-  /*Start*/
-  /*Send Address High Byte*/
-  /* Send Write Block Cmd
-  */
-  I2CMasterSlaveAddrSet(I2C0_BASE, bAddr, WRITE);
-  I2CMasterDataPut(I2C0_BASE, *pbTemp);
-  I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_START);
-  DelayMs(1);
-  /* Idle wait
-  */
-  while(I2CGenIsNotIdle());
-  /* Increment data pointer
-  */
-  pbTemp++;
-  /*Execute Read or Write*/
-  if(fRW == READ) {
-    /* Resend Start condition
-    ** Then send new control byte
-    ** then begin reading
-    */
-    I2CMasterSlaveAddrSet(I2C0_BASE, bAddr, READ);
-    while(I2CMasterBusy(I2C0_BASE));
-    /* Begin Reading
-    */
-    for(i = 0; i < cSize; i++) {
-      if(cSize == i + 1 && cSize == 1) {
-        I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_SINGLE_RECEIVE);
-        DelayMs(1);
-        while(I2CMasterBusy(I2C0_BASE));
-      }
-      else if(cSize == i + 1 && cSize > 1) {
-        I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
-        DelayMs(1);
-        while(I2CMasterBusy(I2C0_BASE));
-      }
-      else if(i == 0) {
-        I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_RECEIVE_START);
-        DelayMs(1);
-        while(I2CMasterBusy(I2C0_BASE));
-        /* Idle wait
-        */
-        while(I2CGenIsNotIdle());
-      }
-      else {
-        I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_RECEIVE_CONT);
-        DelayMs(1);
-        while(I2CMasterBusy(I2C0_BASE));
-        /* Idle wait
-        */
-        while(I2CGenIsNotIdle());
-      }
-      while(I2CMasterBusy(I2C0_BASE));
-      /* Read Data
-      */
-      *pbTemp = (char)I2CMasterDataGet(I2C0_BASE);
-      pbTemp++;
-    }
-  }
-  else if(fRW == WRITE) {
-    /*Loop data bytes
-    */
-    for(i = 0; i < cSize; i++) {
-      /* Send Data
-      */
-      I2CMasterDataPut(I2C0_BASE, *pbTemp);
-      while(I2CMasterBusy(I2C0_BASE));
-      if(i == cSize - 1) {
-        I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_FINISH);
-        DelayMs(1);
-        while(I2CMasterBusy(I2C0_BASE));
-      }
-      else {
-        I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_CONT);
-        DelayMs(1);
-        while(I2CMasterBusy(I2C0_BASE));
-        /* Idle wait
-        */
-        while(I2CGenIsNotIdle());
-      }
-      pbTemp++;
-    }
-  }
-  /*Stop*/
-  return 0x00;
-}
-
 void setup()  {
+  pinMode(GREEN_LED, OUTPUT);
+
   /*
    * First, Set Up the Clock.
    * Main OSC		  -> SYSCTL_OSC_MAIN
@@ -218,22 +117,25 @@ void setup()  {
    */
   GPIOPinTypeGPIOInput(ACCL_INT2Port, ACCL_INT2);
 
+  initGame();
+}
+
+void initGame () {
   srand(0);
   state = createGameState();
-    createCave(state);
+  createCave(state);
 
-    long lBtn1;
-    long lBtn2;
-    printStart();
+  long lBtn1;
+  long lBtn2;
+  printStart();
 
-    do {
-      lBtn1 = GPIOPinRead(BTN1Port, BTN1);
-      lBtn2 = GPIOPinRead(BTN2Port, BTN2);
-    } while (lBtn1 != BTN1 && lBtn2 != BTN2);
+  do {
+    lBtn1 = GPIOPinRead(BTN1Port, BTN1);
+    lBtn2 = GPIOPinRead(BTN2Port, BTN2);
+  } while (lBtn1 != BTN1 && lBtn2 != BTN2);
 }
 
 void render() {
-  // OrbitOledClear();
   OrbitOledMoveTo(0,0);
   OrbitOledSetCursor(0,0);
 
@@ -248,30 +150,20 @@ void render() {
   OrbitOledUpdate();
 }
 
-void loop()  {
-  // This is how deltaTime should work - but I can't get the clock() to compile
+int SPEED;
 
-  // clock_t currentTime = clock();
-  // double deltaTime;
-  // if (!lastTime) {
-  //   deltaTime = 0.0;
-  // } else {
-  //   deltaTime = (double)(currentTime - lastTime) / CLOCKS_PER_SEC;
-  // }
-
-  // lastTime = currentTime;
-
-  int SPEED = (state->Ptnt);
-
+void loop() {
   readSensorData(state);
+
+  SPEED = (state->Ptnt);
+
   updateGameLogic(state, (2.0 - SPEED/10) / 20); // For now, assume 20 FPS
 
   //If collision is detected (gameover)
-  if (state->gameOver == 1)
-  {
+  if (state->gameOver == 1) {
     printGameOver((long) state->score);
-    delay(5000);
-    setup();
+    delay(2000);
+    initGame();
   }
 
   render();

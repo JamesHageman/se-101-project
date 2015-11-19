@@ -1,8 +1,4 @@
-#include <OrbitOled.h>
-#include <OrbitOledGrph.h>
 #include "cave.h"
-#include "gamestate.h"
-#include "constants.h"
 
 void drawCave(GameState *state) {
   int i=0, j=0, x=0, c=0;

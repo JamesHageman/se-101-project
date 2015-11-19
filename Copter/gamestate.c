@@ -1,7 +1,4 @@
-#include "constants.h"
-#include "Energia.h"
 #include "gamestate.h"
-#include "copter.h"
 #include <stdlib.h>
 
 GameState * createGameState() {

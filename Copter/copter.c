@@ -1,7 +1,4 @@
-#include <LaunchPad.h>
 #include "copter.h"
-#include <OrbitOled.h>
-#include <OrbitOledGrph.h>
 #include "constants.h"
 
 /*
