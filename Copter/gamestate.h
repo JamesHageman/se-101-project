@@ -33,7 +33,7 @@ typedef struct {
   int gameOver;
 
   // Score
-  long score;
+  double score;
 
 } GameState;
 

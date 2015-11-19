@@ -16,7 +16,7 @@ void updateGameLogic(GameState *state, double deltaTime) {
   if (state->copter->y < 3) {
     state->copter->y = 3;
   }
-    
+
   //collision detection alogirthm here
   int coptH = 3;
   int coptW = 4;
@@ -39,7 +39,7 @@ void updateGameLogic(GameState *state, double deltaTime) {
   // } else ledControl(4,0);
 
   // update score
-  state->score += (state->Ptnt / 10)*1; // modified by speed of game
+  state->score += (state->Ptnt / 10.0)*1; // modified by speed of game
 
   // I LIKE IT WHEN LEDS LIGHT UP FAM
   if (state->score > 200) ledControl(4,1);
