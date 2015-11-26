@@ -121,9 +121,11 @@ void setup()  {
 }
 
 void initGame () {
-  srand(0);
   state = createGameState();
   createCave(state);
+
+  readSensorData(state);
+  srand((unsigned int)state->Ptnt);
 
   long lBtn1;
   long lBtn2;

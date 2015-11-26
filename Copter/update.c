@@ -1,14 +1,11 @@
 #include "Energia.h"
-#include "gamestate.h"
 #include "update.h"
-#include "constants.h"
-#include "output.h"
 
 int brightness = 0;
 int fadeAmount = 5;
 
 void updateGameLogic(GameState *state, double deltaTime) {
-  //state->cavePosition += 10 * deltaTime;
+  if ( ((int)state->score % 50) < 10) srand((unsigned int)(state->accelY*10));
 
   state->copter->y += 0.1 * state->accelY*deltaTime;
   //copter at bottom stays at bottom
