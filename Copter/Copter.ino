@@ -1,8 +1,6 @@
 extern "C" {
   #include <delay.h>
 
-  #include "gamestate.h"
-  #include "copter.h"
   #include "input.h"
   #include "cave.h"
   #include "update.h"
@@ -127,14 +125,9 @@ void initGame () {
   readSensorData(state);
   srand((unsigned int)state->Ptnt);
 
-  long lBtn1;
-  long lBtn2;
   printStart();
 
-  do {
-    lBtn1 = GPIOPinRead(BTN1Port, BTN1);
-    lBtn2 = GPIOPinRead(BTN2Port, BTN2);
-  } while (lBtn1 != BTN1 && lBtn2 != BTN2);
+  while (!state->Btn1 && !state->Btn2) readSensorData(state);
 }
 
 void render() {
@@ -152,14 +145,11 @@ void render() {
   OrbitOledUpdate();
 }
 
-int SPEED;
 
 void loop() {
   readSensorData(state);
 
-  SPEED = (state->Ptnt);
-
-  updateGameLogic(state, (2.0 - SPEED/10) / 20); // For now, assume 20 FPS
+  updateGameLogic(state, (2.0 - state->Ptnt/10) / 20); // For now, assume 20 FPS
 
   //If collision is detected (gameover)
   if (state->gameOver == 1) {
@@ -169,5 +159,5 @@ void loop() {
   }
 
   render();
-  delay(10-SPEED);
+  delay(10-state->Ptnt);
 }
